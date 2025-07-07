@@ -10,14 +10,6 @@ A lightweight Axios-based client for interacting with Strapi v4+ REST API. Simpl
 - ✅ Simple, intuitive API for CRUD operations
 - ✅ Works with both Strapi v4 and v5
 
-## Installation
-
-```bash
-npm install strapi-rest-client
-# or
-yarn add strapi-rest-client
-```
-
 ## Usage
 
 ### Basic Setup
