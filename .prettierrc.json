@@ -1,0 +1,28 @@
+{
+  "proseWrap": "always",
+  "printWidth": 120,
+  "quoteProps": "consistent",
+  "singleQuote": true,
+  "tabWidth": 2,
+  "trailingComma": "es5",
+  "importOrder": [
+    "<THIRD_PARTY_MODULES>",
+    "^@app/(.*)$",
+    "^@assets/(.*)$",
+    "^@components/(.*)$",
+    "^@constants/(.*)$",
+    "^@containers/(.*)$",
+    "^@context/(.*)$",
+    "^@emails/(.*)$",
+    "^@hocs/(.*)$",
+    "^@hooks/(.*)$",
+    "^@lib/(.*)$",
+    "^@mocks/(.*)$",
+    "^@store/(.*)$",
+    "^@utils/(.*)$",
+    "^[./]"
+  ],
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true,
+  "plugins": ["@trivago/prettier-plugin-sort-imports"]
+}
