@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import axios, { type AxiosInstance } from 'axios';
 import qs from 'qs';
 
 export interface StrapiClientOptions {
@@ -8,43 +7,65 @@ export interface StrapiClientOptions {
 }
 
 export class StrapiClient {
-  private client: AxiosInstance;
+  private baseURL: string;
+  private headers: Record<string, string>;
 
   constructor({ baseURL, token }: StrapiClientOptions) {
-    this.client = axios.create({
-      baseURL,
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-      paramsSerializer: {
-        serialize: (params) => qs.stringify(params, { encodeValuesOnly: true }),
-      },
-    });
+    this.baseURL = baseURL;
+    this.headers = {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    };
+  }
+
+  private async request(url: string, options: RequestInit = {}, params?: any) {
+    const queryString = params ? qs.stringify(params, { encodeValuesOnly: true }) : '';
+    const fullUrl = `${this.baseURL}${url}${queryString ? `?${queryString}` : ''}`;
+
+    try {
+      const response = await fetch(fullUrl, {
+        ...options,
+        headers: this.headers,
+      });
+
+      if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('StrapiClient request error:', error);
+      throw error;
+    }
   }
 
   async getEntries(collection: string, params?: any) {
-    const res = await this.client.get(`/${collection}`, { params });
-    return res.data;
+    return this.request(`/${collection}`, { method: 'GET' }, params);
   }
 
   async getEntry(collection: string, id: number) {
-    const res = await this.client.get(`/${collection}/${id}`);
-    return res.data;
+    return this.request(`/${collection}/${id}`, { method: 'GET' });
   }
 
   async createEntry(collection: string, data: any, params?: any) {
-    const res = await this.client.post(`/${collection}`, { data }, { params });
-    return res.data;
+    return this.request(
+      `/${collection}`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ data }),
+      },
+      params
+    );
   }
 
   async updateEntry(collection: string, id: number, data: any) {
-    const res = await this.client.put(`/${collection}/${id}`, { data });
-    return res.data;
+    return this.request(`/${collection}/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify({ data }),
+    });
   }
 
   async deleteEntry(collection: string, id: number) {
-    const res = await this.client.delete(`/${collection}/${id}`);
-    return res.data;
+    return this.request(`/${collection}/${id}`, { method: 'DELETE' });
   }
 }

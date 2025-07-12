@@ -1,68 +1,125 @@
-# Strapi REST Client
+# Strapi Client Library
 
-A lightweight Axios-based client for interacting with Strapi v4+ REST API. Simplifies common CRUD operations with TypeScript support.
+A lightweight, fetch-based client for interacting with Strapi v4+ APIs, designed for both server-side and client-side usage.
 
 ## Features
 
-- ✅ Full TypeScript support
-- ✅ Handles authentication out of the box
-- ✅ Proper parameter serialization with `qs`
-- ✅ Simple, intuitive API for CRUD operations
-- ✅ Works with both Strapi v4 and v5
+- TypeScript support
+- Simple API mirroring Strapi's REST endpoints
+- Automatic error handling
+- Query parameter serialization
+- Works in Node.js, Next.js server components, and browsers
 
 ## Usage
 
-### Basic Setup
+### Initialization
 
 ```typescript
-import { StrapiClient } from 'strapi-rest-client';
+import { StrapiClient } from '@your-username/strapi-client';
 
-const client = new StrapiClient({
+const strapi = new StrapiClient({
   baseURL: 'https://your-strapi-instance.com/api',
-  token: 'your-api-token-here'
+  token: 'your-api-token',
 });
 ```
 
-### API Methods
+### Basic CRUD Operations
 
-#### Get Multiple Entries
+#### Get multiple entries
+
 ```typescript
-// Get all published articles
-const articles = await client.getEntries('articles');
-
-// With parameters
-const filteredArticles = await client.getEntries('articles', {
-  filters: { title: { $contains: 'Strapi' } },
-  populate: '*',
-  sort: 'createdAt:desc'
+// Get all articles with filters
+const articles = await strapi.getEntries('articles', {
+  filters: { published: { $eq: true } },
+  populate: ['author', 'cover'],
+  sort: ['publishedAt:desc'],
+  pagination: { page: 1, pageSize: 10 }
 });
 ```
 
-#### Get Single Entry
+#### Get single entry
+
 ```typescript
-const article = await client.getEntry('articles', 1);
+const article = await strapi.getEntry('articles', 123);
 ```
 
-#### Create Entry
+#### Create entry
+
 ```typescript
-const newArticle = await client.createEntry('articles', {
+const newArticle = await strapi.createEntry('articles', {
   title: 'New Post',
-  content: 'Lorem ipsum...'
+  content: 'Lorem ipsum...',
+  published: true
 });
 ```
 
-#### Update Entry
+#### Update entry
+
 ```typescript
-const updatedArticle = await client.updateEntry('articles', 1, {
+const updatedArticle = await strapi.updateEntry('articles', 123, {
   title: 'Updated Title'
 });
 ```
 
-#### Delete Entry
+#### Delete entry
+
 ```typescript
-await client.deleteEntry('articles', 1);
+await strapi.deleteEntry('articles', 123);
+```
+
+## API Reference
+
+### Constructor
+
+`new StrapiClient(options: StrapiClientOptions)`
+
+**Options:**
+- `baseURL`: string - Your Strapi instance base URL (include `/api`)
+- `token`: string - API token
+
+### Methods
+
+All methods return a Promise resolving to the Strapi response data.
+
+#### `getEntries(collection: string, params?: any)`
+- `collection`: Content-type name (plural)
+- `params`: Query parameters (filters, populate, etc.)
+
+#### `getEntry(collection: string, id: number)`
+- `collection`: Content-type name (plural)
+- `id`: Entry ID
+
+#### `createEntry(collection: string, data: any, params?: any)`
+- `collection`: Content-type name (plural)
+- `data`: Entry data
+- `params`: Additional query parameters
+
+#### `updateEntry(collection: string, id: number, data: any)`
+- `collection`: Content-type name (plural)
+- `id`: Entry ID
+- `data`: Partial update data
+
+#### `deleteEntry(collection: string, id: number)`
+- `collection`: Content-type name (plural)
+- `id`: Entry ID to delete
+
+## Error Handling
+
+The client throws errors for:
+- Network failures
+- HTTP errors (non-2xx responses)
+- Invalid responses
+
+Catch errors with try/catch:
+
+```typescript
+try {
+  const data = await strapi.getEntry('articles', 123);
+} catch (error) {
+  console.error('API error:', error);
+}
 ```
 
 ## License
 
-MIT © Evgeni Ivanov
+MIT
